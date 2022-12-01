@@ -56,6 +56,10 @@ class IpaddrResource(Resource):
         data = request.get_json()
         # Get remote IP address from caller
         remote_addr = request.remote_addr
+        # Valitate seconds value
+        if type(data['seconds']) is not int:
+            return jsonify({'error': 'Seconds must be integer'})
+
         # Validated IP address format
         if is_valid_ip_address(data['ipaddress']):
             # Search for IP in database
