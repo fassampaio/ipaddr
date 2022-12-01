@@ -66,13 +66,13 @@ class IpaddrResource(Resource):
             # If IP not found
             else:
                 # Define datetime values
-                created = datetime.now().replace(microsecond=0)
-                remove = datetime.now().replace(microsecond=0) + timedelta(seconds=data['seconds'])
+                now = datetime.now()
+                remove = datetime.now() + timedelta(seconds=data['seconds'])
                 # Creates a IP record
                 new_ip = Ipaddresses(
                     ipaddress = data['ipaddress'],
                     location = data['location'].lower(),
-                    created = created,
+                    created = now,
                     remove = remove,
                     owner_ip = remote_addr,
                     user_id = current_user.username
@@ -82,6 +82,7 @@ class IpaddrResource(Resource):
                     domain = 'ip address',
                     action = 'add',
                     obj = data['ipaddress'] + ',' + data['location'].lower(),
+                    date = now,
                     owner_ip = remote_addr,
                     user_id = current_user.username
                 )
@@ -107,11 +108,13 @@ class IpaddrResource(Resource):
             ip_address = Ipaddresses.query.filter_by(ipaddress=data['ipaddress'], location=data['location'].lower()).first()
             # If IP found
             if ip_address:
+                now = datetime.now()
                 # Create a Activity record
                 new_activity = Activity(
                     domain = 'ip address',
                     action = 'delete',
                     obj = data['ipaddress'] + ',' + data['location'].lower(),
+                    date = now,
                     owner_ip = remote_addr,
                     user_id = current_user.username
                 )
@@ -151,11 +154,13 @@ class CleanupResource(Resource):
             location = ipaddress.location
             # Verify if date is expired
             if actual_date > ipaddress.remove:
+                now = datetime.now()
                 # Create a Activity record
                 new_activity = Activity(
                     domain = 'ip address',
                     action = 'delete expired',
                     obj = ipaddress.ipaddress + ',' + location,
+                    date = now,
                     owner_ip = remote_addr,
                     user_id = current_user.username
                 )
@@ -204,11 +209,13 @@ class DelAllResource(Resource):
                     ipaddr_data['location'] = ipaddress.location
                     output.append(ipaddr_data)
                     del_counter += 1
+                    now = datetime.now()
                     # Create a Activity record
                     new_activity = Activity(
                         domain = 'ip address',
                         action = 'delete all',
                         obj = ipaddress.ipaddress + ',' + ipaddress.location,
+                        date = now,
                         owner_ip = remote_addr,
                         user_id = current_user.username
                     )
@@ -226,11 +233,13 @@ class DelAllResource(Resource):
                         ipaddr_data['location'] = ipaddress.location
                         output.append(ipaddr_data)
                         del_counter += 1
+                        now = datetime.now()
                         # Create a Activity record
                         new_activity = Activity(
                             domain = 'ip address',
                             action = 'delete all',
                             obj = ipaddress.ipaddress + ',' + ipaddress.location,
+                            date = now,
                             owner_ip = remote_addr,
                             user_id = current_user.username
                         )

@@ -1,3 +1,4 @@
+from datetime import datetime
 import click
 from ipaddr.ext.database import db
 from werkzeug.security import generate_password_hash
@@ -25,11 +26,13 @@ def init_app(app):
     @click.option('--password', '-p')
     def add_user(name, username, password):
         """Adds a new user to the database"""
+        now = datetime.now()
         hashed_password = generate_password_hash(password, method='pbkdf2:sha512')
         new_user = Users(
             name = name,
             username = username,
-            password = hashed_password
+            password = hashed_password,
+            created = now
         )
         db.session.add(new_user)
         db.session.commit()
@@ -41,9 +44,11 @@ def init_app(app):
     @click.option('--ipaddress', '-i')
     def add_client(name, ipaddress):
         # Creates a client record
+        now = datetime.now()
         new_ip = Clients(
             ipaddress=ipaddress,
             description=name,
+            created = now,
             owner_ip = '127.0.0.1',
             user_id = 1
         )

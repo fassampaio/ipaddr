@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import jsonify, request
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash
@@ -54,16 +56,19 @@ class UserResource(Resource):
         elif len(data['name']) < 2:
             return jsonify({'error': 'Name must be greater than 1 characters.'})
         else:
+            now = datetime.now()
             new_user = Users(
                 username=data['username'],
                 password=hashed_password,
-                name=data['name']
+                name=data['name'],
+                created = now
             )
             # Create a Activity record
             new_activity = Activity(
                 domain = 'user',
                 action = 'add',
                 obj = data['username'],
+                date = now,
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )
@@ -85,11 +90,13 @@ class UserResource(Resource):
             return jsonify({'error': 'User not found.'})
         # if user found
         else:
+            now = datetime.now()
             # Create a Activity record
             new_activity = Activity(
                 domain = 'user',
                 action = 'delete',
                 obj = data['username'],
+                date = now,
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )

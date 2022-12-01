@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from functools import wraps
 
 from flask import jsonify, request
@@ -71,10 +72,12 @@ class ClientResource(Resource):
         elif not is_valid_ip_address(data['ipaddress']):
             return jsonify({'error': 'Invalid Client IP address.'})
         else:
+            now = datetime.now()
             # Creates a client record
             new_ip = Clients(
                 ipaddress=data['ipaddress'],
                 description=data['description'],
+                created = now,
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )
@@ -83,6 +86,7 @@ class ClientResource(Resource):
                 domain = 'client',
                 action = 'add',
                 obj = data['ipaddress'],
+                date = now,
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )
@@ -107,11 +111,13 @@ class ClientResource(Resource):
         elif not ip_address:
             return jsonify({"error": "Client IP address don't exists."})
         else:
+            now = datetime.now()
             # Create a Activity record
             new_activity = Activity(
                 domain = 'client',
                 action = 'delete',
                 obj = data['ipaddress'],
+                date = now,
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )

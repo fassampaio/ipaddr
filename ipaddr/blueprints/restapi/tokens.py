@@ -8,7 +8,6 @@ from flask_restful import Resource
 from werkzeug.security import check_password_hash
 
 from ipaddr.models import db, Users, Activity
-from .clients import client_filter
 
 
 def token_required(f):
@@ -37,11 +36,7 @@ def token_required(f):
 
 
 class TokenResource(Resource):
-    method_decorators = {
-        'get': [client_filter]
-    }
-
-    def get(self, *args, **kwargs):
+    def get(self):
         # Get credentials from request
         auth = request.authorization
         # Get remote IP address from caller
@@ -65,11 +60,13 @@ class TokenResource(Resource):
             }
             # Generates JWT (JSON Web Token)
             token = jwt.encode(payload, key=current_app.config['SECRET_KEY'], algorithm='HS256')
+            now = datetime.now()
             # Create a Activity record
             new_activity = Activity(
                 domain = 'token',
                 action = 'generate',
                 obj = 'generate token',
+                date = now,
                 owner_ip = remote_addr,
                 user_id = auth.username
             )
