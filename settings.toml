@@ -1,0 +1,23 @@
+[default]
+VERSION = '1.0.0'
+DEBUG = false
+LOGGING_LEVEL = 30
+LOGGING_FILE_URI = "ipaddr.log"
+SQLALCHEMY_DATABASE_URI = 'sqlite:///ipaddr.db'
+SECRET_KEY = "ar09ds98fs09d0ghjw4kjd0f94kj3h2340987sfdh2j3r09ufsdkh239ru00das8afw3"
+EXTENSIONS = [
+    "ipaddr.ext.log:init_app",
+    "ipaddr.ext.database:init_app",
+    "ipaddr.ext.commands:init_app",
+    "ipaddr.blueprints.restapi:init_app",
+]
+
+[development]
+DEBUG = true
+LOGGING_LEVEL = 10
+LOGGING_FILE_URI = "C:/Users/fabio.sampaio/OneDrive - NTT/Documents/netdevops/ipaddr/ipaddr/ipaddr.log"
+SQLALCHEMY_DATABASE_URI = 'sqlite:///C:/Users/fabio.sampaio/OneDrive - NTT/Documents/netdevops/ipaddr/ipaddr/ipaddr.db'
+EXTENSIONS = [
+    "dynaconf_merge_unique"  # to reuse extensions list from [default]
+]
+TEMPLATES_AUTO_RELOAD = true
