@@ -1,61 +1,172 @@
 {% extends "base.html" %}
 {% block title %}Users{% endblock %}
 {% block content%}
-<h1>Add users</h1>
-<form method="POST">
-    <div class="form-group row">
-        <label for="user" class="col-sm-2 col-form-label">Username</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="username" name="username" placeholder="Enter username"
-            value="{% if edit_user|length != 0 %}ok{% endif %}" />
-        </div>    
-    </div>
-    <div class="form-group row">
-        <label for="password" class="col-sm-2 col-form-label">Password</label>
-        <div class="col-sm-10">
-            <input type="password" class="form-control" id="password1" name="password1" placeholder="Enter password" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <label for="password" class="col-sm-2 col-form-label">Repeat password</label>
-        <div class="col-sm-10">
-            <input type="password" class="form-control" id="password2" name="password2" placeholder="Enter password" />
-        </div>    
-    </div>
-    <div class="form-group row">
-        <label for="name" class="col-sm-2 col-form-label">Name</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter name" />
-        </div>
-    </div>
-    <div class="form-group row">
-        <div class="col-sm-10">
-            <button type="submit" class="btn btn-primary">Add user</button>
-        </div>    
-    </div>
-</form>
 
-<h3>User list</h3>
-<table class="table table-hover">
-    <thead class="thead-light">
-        <tr>
-            <th scope="col">Username</th>
-            <th scope="col">Name</th>
-            <th scope="col">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for user in users %}
-        <tr>
-            <td>{{ user.username }}</td>
-            <td>{{ user.name }}</td>
-            <td>
-                <a class="btn btn-danger" href="#" onClick="deleteUser('{{ user.username }}')">
-                    <i class="bi bi-trash"></i>Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+            <div class="jumbotrom p-3">
+                <h2>Manage Users <button type="button" class="btn btn-success btn-sm float-right"
+                    data-toggle="modal" data-target="#modaladd">Add Users</button></h2>
+    
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            {% if category == 'error' %}
+                                <div class="alert alert-danger alter-dismissable fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% elif category == 'warning' %}
+                                <div class="alert alert-warning alter-dismissable fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-success alter-dismissable fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <table class="table table-hover">
+                    <thead class="thead-light">
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Username</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>
+                                <a class="btn btn-danger btn-sm" data-toggle="modal"
+                                    href="#" data-target="#modaldelete{{ user.id }}">Delete
+                                </a>
+                            </td>
+                        </tr>
+
+                        <!-- Modal Add -->
+                        <div class="modal fade" id="modaladd" role="dialog">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Add User</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('webui.users') }}" method="POST">
+                                            <div class="form-group row">
+                                                <label for="user" class="col-sm-2 col-form-label">Username</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="username"
+                                                        name="username" placeholder="Enter username"
+                                                        required="1"
+                                                    />
+                                                </div>    
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="password" class="col-sm-2 col-form-label">Password</label>
+                                                <div class="col-sm-10">
+                                                    <input type="password" class="form-control" id="password1"
+                                                        name="password1" placeholder="Enter password"
+                                                        required="1"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="password" class="col-sm-2 col-form-label">Repeat password</label>
+                                                <div class="col-sm-10">
+                                                    <input type="password" class="form-control" id="password2"
+                                                        name="password2" placeholder="Enter password"
+                                                        required="1"
+                                                    />
+                                                </div>    
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="name" class="col-sm-2 col-form-label">Name</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="name"
+                                                        name="name" placeholder="Enter name"
+                                                        required="1"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary btn-sm float-right">Add User</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Delete -->
+                        <div class="modal fade" id="modaldelete{{ user.id }}" role="dialog">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Delete User</h5>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form action="{{ url_for('webui.userdel') }}" method="POST">
+                                            <div class="form-group row">
+                                                <label for="id" class="col-sm-2 col-form-label">id</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="id"
+                                                    name="id" value="{{ user.id }}" readonly
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="username" class="col-sm-2 col-form-label">Username</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="username"
+                                                    name="username" value="{{ user.username }}" readonly
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row">
+                                                <label for="name" class="col-sm-2 col-form-label">Name</label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control" id="name'"
+                                                    name="name" value="{{ user.name }}" readonly
+                                                    />
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Delete</button>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+
+
+
+            </div>
+        </div>
+    </div>
+</div>    
 
 {% endblock %}

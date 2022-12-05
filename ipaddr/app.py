@@ -5,7 +5,12 @@ from ipaddr.ext import configuration
 
 
 def minimal_app(**config):
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        static_url_path='',
+        static_folder='blueprints/webui/static',
+        template_folder='blueprints/webui/templates'
+    )
     configuration.init_app(app, **config)
     return app
 

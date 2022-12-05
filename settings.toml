@@ -5,7 +5,6 @@ LOGGING_LEVEL = 30
 LOGGING_FILE_URI = "ipaddr.log"
 SQLALCHEMY_DATABASE_URI = 'sqlite:///ipaddr.db'
 SECRET_KEY = "ar09ds98fs09d0ghjw4kjd0f94kj3h2340987sfdh2j3r09ufsdkh239ru00das8afw3"
-STATIC_FOLDER = "/blueprints/webui/static"
 EXTENSIONS = [
     "ipaddr.ext.log:init_app",
     "ipaddr.ext.database:init_app",
