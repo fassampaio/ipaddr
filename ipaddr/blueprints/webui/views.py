@@ -7,7 +7,7 @@ from flask import render_template, request, flash, redirect, url_for, current_ap
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from ipaddr.models import db, Users, Clients, Ipaddresses
+from ipaddr.models import db, Users, Clients, Ipaddresses, Activity
 from ipaddr.utils import is_valid_ip_address
 
 
@@ -73,7 +73,17 @@ def ipaddress():
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )
+            # Create a Activity record
+            new_activity = Activity(
+                domain = 'ip address',
+                action = 'add',
+                obj = ipaddress + ',' + location.lower(),
+                date = created,
+                owner_ip = remote_addr,
+                user_id = current_user.username
+            )
             db.session.add(new_ip)
+            db.session.add(new_activity)
             db.session.commit()
             flash('IP Address added!', category='success')
 
@@ -84,9 +94,22 @@ def ipaddress():
 @login_required
 def ipaddressdel():
     ip_id = request.form.get('ip_id')
+    # Get remote IP address from caller
+    remote_addr = request.remote_addr
     ipaddress = Ipaddresses.query.filter_by(ip_id=ip_id).first()
     if ipaddress:
+        now = datetime.now()
+        # Create a Activity record
+        new_activity = Activity(
+            domain = 'ip address',
+            action = 'delete',
+            obj = ipaddress.ipaddress + ',' + ipaddress.location,
+            date = now,
+            owner_ip = remote_addr,
+            user_id = current_user.username
+        )
         db.session.delete(ipaddress)
+        db.session.add(new_activity)
         db.session.commit()
         flash('IP Address deleted!', category='success')
     return redirect(url_for('webui.ipaddress'))
@@ -106,13 +129,24 @@ def clients():
         elif len(description) < 2:
             flash('Description must be greater than 1.', category='error')
         else:
+            now = datetime.now()
             new_client = Clients(
                 ipaddress=ipaddress,
                 description=description,
                 owner_ip = remote_addr,
                 user_id = current_user.username
             )
+            # Create a Activity record
+            new_activity = Activity(
+                domain = 'client',
+                action = 'add',
+                obj = ipaddress,
+                date = now,
+                owner_ip = remote_addr,
+                user_id = current_user.username
+            )
             db.session.add(new_client)
+            db.session.add(new_activity)
             db.session.commit()
             flash('Client IP Address added!', category='success')
 
@@ -123,9 +157,21 @@ def clients():
 @login_required
 def clientdel():
     client_id = request.form.get('client_id')
+    remote_addr = request.remote_addr
     client = Clients.query.filter_by(client_id=client_id).first()
     if client:
+        now = datetime.now()
+        # Create a Activity record
+        new_activity = Activity(
+            domain = 'client',
+            action = 'delete',
+            obj = client.ipaddress,
+            date = now,
+            owner_ip = remote_addr,
+            user_id = current_user.username
+        )
         db.session.delete(client)
+        db.session.add(new_activity)
         db.session.commit()
         flash('Client IP deleted!', category='success')
     return redirect(url_for('webui.clients'))
@@ -153,12 +199,23 @@ def users():
             elif len(name) < 2:
                 flash('Name must be greater than 1.', category='error')
             else:
+                now = datetime.now()
                 new_user = Users(
                     username=username,
                     password=hashed_password,
                     name=name
                 )
+                # Create a Activity record
+                new_activity = Activity(
+                    domain = 'user',
+                    action = 'add',
+                    obj = username,
+                    date = now,
+                    owner_ip = remote_addr,
+                    user_id = current_user.username
+                )
                 db.session.add(new_user)
+                db.session.add(new_activity)
                 db.session.commit()
                 payload = {
                     'username': username,
@@ -174,9 +231,22 @@ def users():
 @login_required
 def userdel():
     id = request.form.get('id')
+    # Get remote IP address from caller
+    remote_addr = request.remote_addr
     user = Users.query.filter_by(id=id).first()
     if user:
+        now = datetime.now()
+        # Create a Activity record
+        new_activity = Activity(
+            domain = 'user',
+            action = 'delete',
+            obj = user.username,
+            date = now,
+            owner_ip = remote_addr,
+            user_id = current_user.username
+        )
         db.session.delete(user)
+        db.session.add(new_activity)
         db.session.commit()
         flash('User deleted!', category='success')
     return redirect(url_for('webui.users'))
